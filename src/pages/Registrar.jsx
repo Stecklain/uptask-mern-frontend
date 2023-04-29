@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import Alerta from "../components/Alerta";
+import axios from "axios";
 
 const Registrar = () => {
 
@@ -10,7 +11,7 @@ const Registrar = () => {
     const [ repetirPassword, setRepetirPassword ] = useState('');
     const [ alerta, setAlerta ] = useState({});
 
-    const handleSubmit = e => {
+    const handleSubmit = async e => {
         e.preventDefault();
 
         if([nombre, email, password, repetirPassword].includes('')){
@@ -20,6 +21,36 @@ const Registrar = () => {
             });
             return;
         }
+
+        if(password !== repetirPassword) {
+            setAlerta({
+                msg: 'Los passwords no son iguales',
+                error: true
+            })
+        }
+
+        if(password.length < 8) {
+            setAlerta({
+                msg: 'El password es muy corto, debe tener mínimo 8 caracteres',
+                error: true
+            })
+        }
+
+        setAlerta({})
+
+        try {
+            const { data } = await axios.post('http://localhost:4000/api/usuarios',
+            {
+                nombre,
+                password, 
+                email
+            });
+            
+            setAlerta({ msg: data.msg, error: false });
+        } catch (error) {
+            console.log(error);
+        }
+
     }
 
     const { msg } = alerta;
