@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import Alerta from "../components/Alerta";
-import axios from "axios";
+import clienteAxios from "../config/clienteAxios";
 
 const Registrar = () => {
 
@@ -39,13 +39,18 @@ const Registrar = () => {
         setAlerta({})
 
         try {
-            const { data } = await axios.post('http://localhost:4000/api/usuarios',
+            const { data } = await clienteAxios.post(`/usuarios`,
             {
                 nombre,
                 password, 
                 email
             });
             
+            setNombre('');
+            setEmail('');
+            setPassword('');
+            setRepetirPassword('');
+
             setAlerta({ msg: data.msg, error: false });
         } catch (error) {
             console.log(error);

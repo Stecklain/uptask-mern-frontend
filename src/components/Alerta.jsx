@@ -1,4 +1,4 @@
-const Alerta = ({alerta}) => {
+const Alerta = ({ alerta }) => {
     return (
         <div 
             className={
