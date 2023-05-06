@@ -38,8 +38,9 @@ const FormularioProyecto = () => {
             return;
         }
 
-        await submitProyecto({ nombre, descripcion, fechaEntrega, cliente });       
+        await submitProyecto({ id, nombre, descripcion, fechaEntrega, cliente });       
         
+        setId(null);
         setNombre('');
         setDescripcion('');
         setFechaEntrega('');

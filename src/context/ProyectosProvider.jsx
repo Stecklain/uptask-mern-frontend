@@ -47,6 +47,46 @@ const ProyectosProvider = ({children}) => {
 
     const submitProyecto = async proyecto => {
 
+        if(proyecto.id){
+            await editarProyecto(proyecto);
+        }else{
+            await nuevoProyecto(proyecto);
+        }        
+    }
+
+    const editarProyecto = async proyecto => {
+        try {
+            const token = localStorage.getItem('token');
+            if(!token) return;
+
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                }
+            }
+
+            const { data } = await clienteAxios.put(`/proyectos/${proyecto.id}`, proyecto, config);
+
+            const proyectosActualizados = proyectos.map(proyectoState => proyectoState._id === data._id ? data : proyectoState);
+            setProyectos(proyectosActualizados);
+
+            setAlerta({
+                msg: 'Proyecto actualizado correctamente',
+                error: false,
+            });
+
+            setTimeout(() => {
+                setAlerta({});
+                navigate('/proyectos');
+            }, 3000)
+            
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const nuevoProyecto = async proyecto => {
         try {
             const token = localStorage.getItem('token');
             if(!token) return;
@@ -93,13 +133,45 @@ const ProyectosProvider = ({children}) => {
             const { data } = await clienteAxios(`/proyectos/${id}`, config);
 
             setProyecto(data);
-
             
         } catch (error) {
             console.log(error);
         }finally{
             setCargando(false);
         }    
+    }
+
+    const eliminarProyecto = async id => {
+        try {
+            const token = localStorage.getItem('token');
+            if(!token) return;
+
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                }
+            }
+
+            const { data } = await clienteAxios.delete(`/proyectos/${id}`, config);
+
+            const proyectosActualizados = proyectos.filter(proyectoState => proyectoState._id !== id)
+
+            setProyectos(proyectosActualizados);
+              
+            setAlerta({
+                msg: data.msg,
+                error: false,
+            });
+
+            setTimeout(() => {
+                setAlerta({});
+                navigate('/proyectos');
+            }, 3000)
+            
+        } catch (error) {
+            
+        }
     }
 
     return (
@@ -111,7 +183,8 @@ const ProyectosProvider = ({children}) => {
                 submitProyecto,
                 obtenerProyecto,
                 proyecto,
-                cargando
+                cargando,
+                eliminarProyecto
             }}
         >
             {children}
